@@ -1,4 +1,4 @@
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     1
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.2.7.0
@@ -10,7 +10,7 @@ LOC  OBJ            LINE     SOURCE
 
                        1     ;------------------------------------
                        2     ;-  Generated Initialization File  --
-                       3     ;
+                       3     ;TABLE1ÊÇË³Ê±ÕëµãÁÁÊÂë¹ÜÑ­»·µÄ±í¸ñ
                        4     ;------------------------------------
                        5     
                        6     ;$include (C8051F310.inc)
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
   009B          +1    55     CPT0CN   DATA  09BH     ; COMPARATOR 0 CONTROL                                     
   009C          +1    56     CPT1MD   DATA  09CH     ; COMPARATOR 1 MODE                                        
   009D          +1    57     CPT0MD   DATA  09DH     ; COMPARATOR 0 MODE                                        
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     2
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     2
 
   009E          +1    58     CPT1MX   DATA  09EH     ; COMPARATOR 1 MUX                                         
   009F          +1    59     CPT0MX   DATA  09FH     ; COMPARATOR 0 MUX                                         
@@ -133,7 +133,7 @@ LOC  OBJ            LINE     SOURCE
   00F0          +1   121     B        DATA  0F0H     ; B REGISTER                                               
   00F1          +1   122     P0MDIN   DATA  0F1H     ; PORT 0 INPUT MODE REGISTER                               
   00F2          +1   123     P1MDIN   DATA  0F2H     ; PORT 1 INPUT MODE REGISTER                               
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     3
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     3
 
   00F3          +1   124     P2MDIN   DATA  0F3H     ; PORT 2 INPUT MODE REGISTER                               
   00F4          +1   125     P3MDIN   DATA  0F4H     ; PORT 3 INPUT MODE REGISTER                               
@@ -201,7 +201,7 @@ LOC  OBJ            LINE     SOURCE
                 +1   187     ; TMR2CN 0xC8 
   00C8          +1   188     T2XCLK   BIT   TMR2CN.0 ; TIMER 2 EXTERNAL CLOCK SELECT                         
   00CA          +1   189     TR2      BIT   TMR2CN.2 ; TIMER 2 ON/OFF CONTROL                                
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     4
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     4
 
   00CB          +1   190     T2SPLIT  BIT   TMR2CN.3 ; TIMER 2 SPLIT MODE ENABLE                             
   00CD          +1   191     TF2LEN   BIT   TMR2CN.5 ; TIMER 2 LOW BYTE INTERRUPT ENABLE                     
@@ -249,134 +249,279 @@ LOC  OBJ            LINE     SOURCE
                      233     
   0080               234               LED BIT P0.0
   00B1               235               BEEP  BIT P3.1
-  0081               236           KINT BIT P0.1
-0000                 237           ORG 0000H
-0000 020100          238           LJMP MAIN
+  0081               236               KINT BIT P0.1
+0000                 237               ORG 0000H
+0000 020100          238               LJMP MAIN
 0003                 239               ORG 0003H
 0003 020200          240               LJMP INTT0
-0100                 241           ORG 0100H
-0100 515D            242     MAIN: ACALL Init_Device
-                     243       
-                     244     ;SETUP:mov R3,#6
-                     245     ;      mov dptr,#TABLE
-                     246     ;LOOP: clr a
-                     247     ;         movc a,@a+dptr
-                     248     ;         mov P1,a
-                     249     ;         acall D0_5S
-                     250     ;         inc dptr
-                     251     ;         DJNZ R3,LOOP
-                     252     ;         ajmp SETUP
-                     253     ;         AJMP $
-0102 758901          254     D10ms:MOV TMOD,#01H
-0105 758CEC          255           MOV TH0,#0ECH
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     5
+0100                 241               ORG 0100H
+0100 5156            242     MAIN: ACALL Init_Device
+0102 C2B1            243           CLR BEEP
+                     244     ;---------¼üÅÌÉ¨Ãè---------
+0104                 245     KEYPRO:
+0104 31BD            246           ACALL KEXAM
+0106 40FC            247           JC KEYPRO
+0108 31EC            248               ACALL D10ms
+010A 31BD            249               ACALL KEXAM
+010C 40F6            250               JC KEYPRO ;ÎÞ°´¼ü°´ÏÂÊ±C=1
+010E 31EC            251               ACALL D10ms
+0110 31BD            252               ACALL KEXAM
+0112 40F0            253               JC KEYPRO
+0114 7AFE            254     KEY1: MOV R2, #0FEH
+0116 7BFF            255           MOV R3, #0FFH  ;ÁÐÖµ¼Ä´æÆ÷
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     5
 
-0108 758A0F          256               MOV TL0,#0FH
-010B D28C            257               SETB TR0
-010D 308DFD          258               JNB TF0,$
-0110 C28D            259               CLR TF0
-0112 C28C            260               CLR TR0
-0114 22              261               RET
-                     262     ;--------end------------        
-                     263     ;-------ÖÐ¶Ï0ÁÁµÆ--------
-0200                 264           ORG 0200H
-0200 B280            265     INTT0:CPL LED
-0202 12020F          266           LCALL D0_5s
-0205 B280            267               CPL LED
-0207 B2B1            268           CPL BEEP
-0209 120226          269               LCALL D2s
-020C B2B1            270               CPL BEEP
-020E 32              271           RETI
-                     272     ;-------end---------
-                     273     ;-------delay 0.5s---------
-020F 7F05            274     D0_5S:MOV R7, #5
-0211 758901          275     L_0_5:MOV TMOD,#01H
-0214 758C38          276           MOV TH0,#38H
-0217 758A9E          277               MOV TL0,#9EH
-021A D28C            278               SETB TR0
-021C 308DFD          279               JNB TF0,$
-021F C28D            280               CLR TF0
-0221 DFEE            281               DJNZ R7, L_0_5
-0223 C28C            282               CLR TR0
-0225 22              283               RET
-                     284     ;------end------
-                     285     ;-------delay 2s---------
-0226 7F14            286     D2s:  MOV R7, #20
-0228 758901          287     L_2:  MOV TMOD,#01H
-                     288     ;      MOV TH0, #36H
-                     289     ;         MOV TL0, #0D3H
-022B 758C38          290           MOV TH0, #38H
-022E 758A91          291               MOV TL0, #91H
-0231 D28C            292               SETB TR0
-0233 308DFD          293               JNB TF0,$
-0236 C28D            294               CLR TF0
-0238 DFEE            295               DJNZ R7, L_2
-023A C28C            296               CLR TR0
-023C 22              297               RET
-                     298     ;--------end-------
-                     299     ;-------delay 10ms-------
-                     300     
-023D C0603018        301     TABLE:DB 0C0H,60H,30H,18H,0CH,84H
-0241 0C84                    
-                     302     ; Peripheral specific initialization functions,
-                     303     ; Called from the Init_Device label
-0243                 304     PCA_Init:
-0243 53D9BF          305         anl  PCA0MD,    #0BFh
-0246 75D900          306         mov  PCA0MD,    #000h
-0249 22              307         ret
-                     308     
-024A                 309     Timer_Init:
-024A 758901          310         mov  TMOD,      #001h
-024D 758E02          311         mov  CKCON,     #002h
-0250 22              312         ret
-                     313     
-0251                 314     Port_IO_Init:
-                     315         ; P0.0  -  Unassigned,  Open-Drain, Digital
-                     316         ; P0.1  -  Unassigned,  Open-Drain, Digital
-                     317         ; P0.2  -  Unassigned,  Open-Drain, Digital
-                     318         ; P0.3  -  Unassigned,  Open-Drain, Digital
-                     319         ; P0.4  -  Unassigned,  Open-Drain, Digital
-                     320         ; P0.5  -  Unassigned,  Open-Drain, Digital
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     6
+0118 7C00            256               MOV R4, #00H  ;ÐÐÖµ¼Ä´æÆ÷
+011A                 257     KEY2: 
+011A C2A0            258           CLR P2.0
+011C D2A1            259               SETB P2.1
+011E D2A2            260               SETB P2.2
+0120 D2A3            261               SETB P2.3
+0122 00              262               NOP
+0123 00              263               NOP
+0124 00              264               NOP
+0125 A2A4            265           MOV C, P2.4
+0127 82A5            266               ANL C, P2.5
+0129 82A6            267               ANL C, P2.6
+012B 82A7            268               ANL C, P2.7
+012D 5048            269               JNC KEY3  ;ÓÐ¼ü°´ÏÂ£¬×ªÇóÁÐÖµ
+012F EC              270               MOV A, R4  ;ÎÞ¼ü°´ÏÂ£¬ÐÐÖµ¼Ä´æÆ÷¼ÓÒ»
+0130 2401            271               ADD A, #01H
+0132 FC              272               MOV R4, A
+0133 D2A0            273               SETB P2.0
+0135 C2A1            274           CLR P2.1
+0137 D2A2            275               SETB P2.2
+0139 D2A3            276               SETB P2.3
+013B 00              277               NOP
+013C 00              278               NOP
+013D 00              279               NOP
+013E A2A4            280           MOV C, P2.4
+0140 82A5            281               ANL C, P2.5
+0142 82A6            282               ANL C, P2.6
+0144 82A7            283               ANL C, P2.7
+0146 502F            284               JNC KEY3  ;ÓÐ¼ü°´ÏÂ£¬×ªÇóÁÐÖµ
+0148 EC              285               MOV A, R4  ;ÎÞ¼ü°´ÏÂ£¬ÐÐÖµ¼Ä´æÆ÷¼ÓÒ»
+0149 2401            286               ADD A, #01H
+014B FC              287               MOV R4, A
+014C D2A0            288               SETB P2.0
+014E D2A1            289               SETB P2.1
+0150 C2A2            290           CLR P2.2
+0152 D2A3            291               SETB P2.3
+0154 00              292               NOP
+0155 00              293               NOP
+0156 00              294               NOP
+0157 A2A4            295           MOV C, P2.4
+0159 82A5            296               ANL C, P2.5
+015B 82A6            297               ANL C, P2.6
+015D 82A7            298               ANL C, P2.7
+015F 5016            299               JNC KEY3  ;ÓÐ¼ü°´ÏÂ£¬×ªÇóÁÐÖµ
+0161 EC              300               MOV A, R4  ;ÎÞ¼ü°´ÏÂ£¬ÐÐÖµ¼Ä´æÆ÷¼ÓÒ»
+0162 2401            301               ADD A, #01H
+0164 FC              302               MOV R4, A       
+0165 C2A3            303           CLR P2.3
+0167 00              304               NOP
+0168 00              305               NOP
+0169 00              306               NOP
+016A A2A4            307           MOV C, P2.4
+016C 82A5            308               ANL C, P2.5
+016E 82A6            309               ANL C, P2.6
+0170 82A7            310               ANL C, P2.7
+0172 5003            311               JNC KEY3  ;ÓÐ¼ü°´ÏÂ£¬×ªÇóÁÐÖµ
+0174 E4              312               CLR A
+0175 2104            313               AJMP KEYPRO
+                     314           
+0177 E5A0            315     KEY3: MOV A, P2
+0179 0B              316     KEY4: INC R3
+017A 33              317               RLC A
+017B 40FC            318               JC KEY4 ;C=1Ê±Ìø×ª
+017D 31EC            319     KEY5: ACALL D10ms
+017F 31BD            320           ACALL KEXAM
+0181 50FA            321               JNC KEY5   ;ÓÐ¼ü°´ÏÂ,×ªÏòKEY4,µÈ´¼üÊÍ·Å
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     6
 
-                     321         ; P0.6  -  Unassigned,  Open-Drain, Digital
-                     322         ; P0.7  -  Unassigned,  Open-Drain, Digital
-                     323     
-                     324         ; P1.0  -  Unassigned,  Open-Drain, Digital
-                     325         ; P1.1  -  Unassigned,  Open-Drain, Digital
-                     326         ; P1.2  -  Unassigned,  Open-Drain, Digital
-                     327         ; P1.3  -  Unassigned,  Open-Drain, Digital
-                     328         ; P1.4  -  Unassigned,  Open-Drain, Digital
-                     329         ; P1.5  -  Unassigned,  Open-Drain, Digital
-                     330         ; P1.6  -  Unassigned,  Open-Drain, Digital
-                     331         ; P1.7  -  Unassigned,  Open-Drain, Digital
-                     332         ; P2.0  -  Unassigned,  Open-Drain, Digital
-                     333         ; P2.1  -  Unassigned,  Open-Drain, Digital
-                     334         ; P2.2  -  Unassigned,  Open-Drain, Digital
-                     335         ; P2.3  -  Unassigned,  Open-Drain, Digital
-                     336     
-0251 75E240          337         mov  XBR1,      #040h
-0254 22              338         ret
-                     339     
-0255                 340     Oscillator_Init:
-0255 75B283          341         mov  OSCICN,    #083h
-0258 22              342         ret
-                     343             
-0259                 344     Interrupts_Init:
-0259 75A881          345         mov  IE,        #081h
-025C 22              346         ret
-                     347     ; Initialization function for device,
-                     348     ; Call Init_Device from your main program
-025D                 349     Init_Device:
-025D 120243          350         lcall PCA_Init
-0260 12024A          351         lcall Timer_Init
-0263 120251          352         lcall Port_IO_Init
-0266 120255          353         lcall Oscillator_Init
-0269 120259          354             lcall Interrupts_Init
-026C 22              355         ret
-                     356     
-                     357     end
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     7
+0183 D2A0            322               SETB P2.0
+0185 D2A1            323               SETB P2.1
+0187 D2A2            324               SETB P2.2
+0189 D2A3            325               SETB P2.3
+018B 7403            326               MOV A, #03H
+018D C3              327               CLR C
+018E 9B              328               SUBB A, R3
+018F 75F004          329               MOV B, #04H
+0192 A4              330               MUL AB
+0193 2C              331               ADD A, R4
+0194 2199            332               AJMP KEYADR
+0196 2104            333               AJMP KEYPRO
+0198 22              334               RET
+                     335     ;---------¹¦ÄÜ¼üµØÖ·×ªÒÆ------
+0199 B40902          336     KEYADR:CJNE A, #09H, KYARD1
+019C 21B9            337            AJMP DIGPRO
+019E 4019            338     KYARD1:JC DIGPRO
+01A0 9001A8          339     KEYTBL:MOV DPTR, #JMPTBL
+01A3 C3              340            CLR C
+01A4 940A            341                SUBB A, #10
+01A6 23              342                RL A
+01A7 73              343                JMP @A+DPTR
+01A8 21B5            344     JMPTBL:AJMP AA
+01AA 21B5            345            AJMP AA
+01AC 21B5            346                AJMP AA
+01AE 21B5            347                AJMP AA
+01B0 21B5            348                AJMP AA
+01B2 21B5            349                AJMP AA
+01B4 22              350            RET
+                     351     ;----------½áÊø------------
+                     352     ;-------¹¦ÄÜ°´¼ü³ÌÐò-------
+01B5 B280            353     AA:   CPL LED 
+01B7 2104            354           AJMP KEYPRO
+                     355     ;-------½áÊø-------------
+                     356     ;-------Ê×Ö°´¼ü´¦Àí---
+01B9 B280            357     DIGPRO:CPL LED
+01BB 2104            358            AJMP KEYPRO
+                     359     ;--------¼ì²â¼üÅÌÊÇ·ñ°´ÏÂ-------
+01BD C2A0            360     KEXAM:CLR P2.0
+01BF C2A1            361           CLR P2.1
+01C1 C2A2            362               CLR P2.2
+01C3 C2A3            363               CLR P2.3
+01C5 00              364               NOP
+01C6 00              365               NOP
+01C7 00              366               NOP
+01C8 A2A4            367               MOV C, P2.4
+01CA 82A5            368               ANL C, P2.5
+01CC 82A6            369               ANL C, P2.6
+01CE 82A7            370               ANL C, P2.7
+01D0 D2A0            371               SETB P2.0
+01D2 D2A1            372               SETB P2.1
+01D4 D2A2            373               SETB P2.2
+01D6 D2A3            374               SETB P2.3
+01D8 22              375               RET
+                     376     ;--------¼ì²â½áÊø--------------
+                     377     
+                     378     ;-----------¼üÅÌÉ¨Ãè½áÊø--------------
+01D9 21D9            379               AJMP $
+                     380     ;-----------------------------×Ó³ÌÐòÇøÓò---------------------------------------
+                     381     ;-----ÁÁµÆ³ÌÐò--------
+01DB 7B06            382     LIG:  mov R3,#6
+01DD 900236          383           mov dptr,#TABLE1
+01E0 E4              384     LP_LIG: clr a
+01E1 93              385               movc a,@a+dptr
+01E2 F590            386               mov P1,a
+01E4 5108            387               acall D0_5S
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     7
+
+01E6 A3              388               inc dptr
+01E7 DBF7            389               DJNZ R3,LP_LIG
+01E9 21DB            390               ajmp LIG
+01EB 22              391               ret
+                     392     ;--------end----------
+                     393     ;-------delay 10ms-------
+01EC 758901          394     D10ms:MOV TMOD,#01H
+01EF 758CEC          395           MOV TH0,#0ECH
+01F2 758A0F          396               MOV TL0,#0FH
+01F5 D28C            397               SETB TR0
+01F7 308DFD          398               JNB TF0,$
+01FA C28D            399               CLR TF0
+01FC C28C            400               CLR TR0
+01FE 22              401               RET
+                     402     ;--------end------------        
+                     403     ;-------ÖÐ¶Ï0ÁÁµÆ--------
+0200                 404           ORG 0200H
+0200 B280            405     INTT0:CPL LED
+0202 120208          406           LCALL D0_5s
+0205 B280            407               CPL LED
+                     408     ;      CPL BEEP
+                     409     ;         LCALL D2s
+                     410     ;         CPL BEEP
+0207 32              411           RETI
+                     412     ;-------end---------
+                     413     ;-------delay 0.5s---------
+0208 7F05            414     D0_5S:MOV R7, #5
+020A 758901          415     L_0_5:MOV TMOD,#01H
+020D 758C38          416           MOV TH0,#38H
+0210 758A9E          417               MOV TL0,#9EH
+0213 D28C            418               SETB TR0
+0215 308DFD          419               JNB TF0,$
+0218 C28D            420               CLR TF0
+021A DFEE            421               DJNZ R7, L_0_5
+021C C28C            422               CLR TR0
+021E 22              423               RET
+                     424     ;------end------
+                     425     ;-------delay 2s---------
+021F 7F14            426     D2s:  MOV R7, #20
+0221 758901          427     L_2:  MOV TMOD,#01H
+                     428     ;      MOV TH0, #36H
+                     429     ;         MOV TL0, #0D3H
+0224 758C38          430           MOV TH0, #38H
+0227 758A91          431               MOV TL0, #91H
+022A D28C            432               SETB TR0
+022C 308DFD          433               JNB TF0,$
+022F C28D            434               CLR TF0
+0231 DFEE            435               DJNZ R7, L_2
+0233 C28C            436               CLR TR0
+0235 22              437               RET
+                     438     ;--------end-------
+                     439     ;-----------------------------×Ó³ÌÐò½áÊø-------------------------------------------------
+                     440     ;--------------±í¸ñ----------------
+0236 C0603018        441     TABLE1:DB 0C0H,60H,30H,18H,0CH,84H
+023A 0C84                    
+                     442     ;------------±í¸ñ½áÊø---------------
+                     443     ; Peripheral specific initialization functions,
+                     444     ; Called from the Init_Device label
+023C                 445     PCA_Init:
+023C 53D9BF          446         anl  PCA0MD,    #0BFh
+023F 75D900          447         mov  PCA0MD,    #000h
+0242 22              448         ret
+                     449     
+0243                 450     Timer_Init:
+0243 758901          451         mov  TMOD,      #001h
+0246 758E02          452         mov  CKCON,     #002h
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     8
+
+0249 22              453         ret
+                     454     
+024A                 455     Port_IO_Init:
+                     456         ; P0.0  -  Unassigned,  Open-Drain, Digital
+                     457         ; P0.1  -  Unassigned,  Open-Drain, Digital
+                     458         ; P0.2  -  Unassigned,  Open-Drain, Digital
+                     459         ; P0.3  -  Unassigned,  Open-Drain, Digital
+                     460         ; P0.4  -  Unassigned,  Open-Drain, Digital
+                     461         ; P0.5  -  Unassigned,  Open-Drain, Digital
+                     462         ; P0.6  -  Unassigned,  Open-Drain, Digital
+                     463         ; P0.7  -  Unassigned,  Open-Drain, Digital
+                     464     
+                     465         ; P1.0  -  Unassigned,  Open-Drain, Digital
+                     466         ; P1.1  -  Unassigned,  Open-Drain, Digital
+                     467         ; P1.2  -  Unassigned,  Open-Drain, Digital
+                     468         ; P1.3  -  Unassigned,  Open-Drain, Digital
+                     469         ; P1.4  -  Unassigned,  Open-Drain, Digital
+                     470         ; P1.5  -  Unassigned,  Open-Drain, Digital
+                     471         ; P1.6  -  Unassigned,  Open-Drain, Digital
+                     472         ; P1.7  -  Unassigned,  Open-Drain, Digital
+                     473         ; P2.0  -  Unassigned,  Open-Drain, Digital
+                     474         ; P2.1  -  Unassigned,  Open-Drain, Digital
+                     475         ; P2.2  -  Unassigned,  Open-Drain, Digital
+                     476         ; P2.3  -  Unassigned,  Open-Drain, Digital
+                     477     
+024A 75E240          478         mov  XBR1,      #040h
+024D 22              479         ret
+                     480     
+024E                 481     Oscillator_Init:
+024E 75B283          482         mov  OSCICN,    #083h
+0251 22              483         ret
+                     484             
+0252                 485     Interrupts_Init:
+0252 75A881          486         mov  IE,        #081h
+0255 22              487         ret
+                     488     ; Initialization function for device,
+                     489     ; Call Init_Device from your main program
+0256                 490     Init_Device:
+0256 12023C          491         lcall PCA_Init
+0259 120243          492         lcall Timer_Init
+025C 12024A          493         lcall Port_IO_Init
+025F 12024E          494         lcall Oscillator_Init
+0262 120252          495             lcall Interrupts_Init
+0265 22              496         ret
+                     497     
+                     498     end
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE     9
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -384,6 +529,7 @@ SYMBOL TABLE LISTING
 
 N A M E             T Y P E  V A L U E   ATTRIBUTES
 
+AA . . . . . . . .  C ADDR   01B5H   A   
 AC . . . . . . . .  B ADDR   00D0H.6 A   
 ACC. . . . . . . .  D ADDR   00E0H   A   
 ACK. . . . . . . .  B ADDR   00C0H.1 A   
@@ -425,9 +571,10 @@ CPT1MD . . . . . .  D ADDR   009CH   A
 CPT1MX . . . . . .  D ADDR   009EH   A   
 CR . . . . . . . .  B ADDR   00D8H.6 A   
 CY . . . . . . . .  B ADDR   00D0H.7 A   
-D0_5S. . . . . . .  C ADDR   020FH   A   
-D10MS. . . . . . .  C ADDR   0102H   A   
-D2S. . . . . . . .  C ADDR   0226H   A   
+D0_5S. . . . . . .  C ADDR   0208H   A   
+D10MS. . . . . . .  C ADDR   01ECH   A   
+D2S. . . . . . . .  C ADDR   021FH   A   
+DIGPRO . . . . . .  C ADDR   01B9H   A   
 DPH. . . . . . . .  D ADDR   0083H   A   
 DPL. . . . . . . .  D ADDR   0082H   A   
 EA . . . . . . . .  B ADDR   00A8H.7 A   
@@ -442,26 +589,39 @@ ET2. . . . . . . .  B ADDR   00A8H.5 A
 EX0. . . . . . . .  B ADDR   00A8H.0 A   
 EX1. . . . . . . .  B ADDR   00A8H.2 A   
 F0 . . . . . . . .  B ADDR   00D0H.5 A   
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE    10
+
 F1 . . . . . . . .  B ADDR   00D0H.1 A   
 FLACL. . . . . . .  D ADDR   00B5H   A   
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     8
-
 FLKEY. . . . . . .  D ADDR   00B7H   A   
 FLSCL. . . . . . .  D ADDR   00B6H   A   
 IE . . . . . . . .  D ADDR   00A8H   A   
 IE0. . . . . . . .  B ADDR   0088H.1 A   
 IE1. . . . . . . .  B ADDR   0088H.3 A   
-INIT_DEVICE. . . .  C ADDR   025DH   A   
-INTERRUPTS_INIT. .  C ADDR   0259H   A   
+INIT_DEVICE. . . .  C ADDR   0256H   A   
+INTERRUPTS_INIT. .  C ADDR   0252H   A   
 INTT0. . . . . . .  C ADDR   0200H   A   
 IP . . . . . . . .  D ADDR   00B8H   A   
 IT0. . . . . . . .  B ADDR   0088H.0 A   
 IT01CF . . . . . .  D ADDR   00E4H   A   
 IT1. . . . . . . .  B ADDR   0088H.2 A   
+JMPTBL . . . . . .  C ADDR   01A8H   A   
+KEXAM. . . . . . .  C ADDR   01BDH   A   
+KEY1 . . . . . . .  C ADDR   0114H   A   
+KEY2 . . . . . . .  C ADDR   011AH   A   
+KEY3 . . . . . . .  C ADDR   0177H   A   
+KEY4 . . . . . . .  C ADDR   0179H   A   
+KEY5 . . . . . . .  C ADDR   017DH   A   
+KEYADR . . . . . .  C ADDR   0199H   A   
+KEYPRO . . . . . .  C ADDR   0104H   A   
+KEYTBL . . . . . .  C ADDR   01A0H   A   
 KINT . . . . . . .  B ADDR   0080H.1 A   
+KYARD1 . . . . . .  C ADDR   019EH   A   
 LED. . . . . . . .  B ADDR   0080H.0 A   
-L_0_5. . . . . . .  C ADDR   0211H   A   
-L_2. . . . . . . .  C ADDR   0228H   A   
+LIG. . . . . . . .  C ADDR   01DBH   A   
+LP_LIG . . . . . .  C ADDR   01E0H   A   
+L_0_5. . . . . . .  C ADDR   020AH   A   
+L_2. . . . . . . .  C ADDR   0221H   A   
 MAIN . . . . . . .  C ADDR   0100H   A   
 MASTER . . . . . .  B ADDR   00C0H.7 A   
 MCE0 . . . . . . .  B ADDR   0098H.5 A   
@@ -470,7 +630,7 @@ NSSMD0 . . . . . .  B ADDR   00F8H.2 A
 NSSMD1 . . . . . .  B ADDR   00F8H.3 A   
 OSCICL . . . . . .  D ADDR   00B3H   A   
 OSCICN . . . . . .  D ADDR   00B2H   A   
-OSCILLATOR_INIT. .  C ADDR   0255H   A   
+OSCILLATOR_INIT. .  C ADDR   024EH   A   
 OSCXCN . . . . . .  D ADDR   00B1H   A   
 OV . . . . . . . .  B ADDR   00D0H.2 A   
 P. . . . . . . . .  B ADDR   00D0H.0 A   
@@ -497,6 +657,8 @@ PCA0CPH3 . . . . .  D ADDR   00EEH   A
 PCA0CPH4 . . . . .  D ADDR   00FEH   A   
 PCA0CPL0 . . . . .  D ADDR   00FBH   A   
 PCA0CPL1 . . . . .  D ADDR   00E9H   A   
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE    11
+
 PCA0CPL2 . . . . .  D ADDR   00EBH   A   
 PCA0CPL3 . . . . .  D ADDR   00EDH   A   
 PCA0CPL4 . . . . .  D ADDR   00FDH   A   
@@ -508,12 +670,10 @@ PCA0CPM4 . . . . .  D ADDR   00DEH   A
 PCA0H. . . . . . .  D ADDR   00FAH   A   
 PCA0L. . . . . . .  D ADDR   00F9H   A   
 PCA0MD . . . . . .  D ADDR   00D9H   A   
-PCA_INIT . . . . .  C ADDR   0243H   A   
+PCA_INIT . . . . .  C ADDR   023CH   A   
 PCON . . . . . . .  D ADDR   0087H   A   
-PORT_IO_INIT . . .  C ADDR   0251H   A   
+PORT_IO_INIT . . .  C ADDR   024AH   A   
 PS0. . . . . . . .  B ADDR   00B8H.4 A   
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE     9
-
 PSCTL. . . . . . .  D ADDR   008FH   A   
 PSPI0. . . . . . .  B ADDR   00B8H.6 A   
 PSW. . . . . . . .  D ADDR   00D0H   A   
@@ -548,7 +708,7 @@ STA. . . . . . . .  B ADDR   00C0H.5 A
 STO. . . . . . . .  B ADDR   00C0H.4 A   
 T2SPLIT. . . . . .  B ADDR   00C8H.3 A   
 T2XCLK . . . . . .  B ADDR   00C8H.0 A   
-TABLE. . . . . . .  C ADDR   023DH   A   
+TABLE1 . . . . . .  C ADDR   0236H   A   
 TB80 . . . . . . .  B ADDR   0098H.3 A   
 TCON . . . . . . .  D ADDR   0088H   A   
 TF0. . . . . . . .  B ADDR   0088H.5 A   
@@ -559,12 +719,14 @@ TF2LEN . . . . . .  B ADDR   00C8H.5 A
 TH0. . . . . . . .  D ADDR   008CH   A   
 TH1. . . . . . . .  D ADDR   008DH   A   
 TI0. . . . . . . .  B ADDR   0098H.1 A   
-TIMER_INIT . . . .  C ADDR   024AH   A   
+TIMER_INIT . . . .  C ADDR   0243H   A   
 TL0. . . . . . . .  D ADDR   008AH   A   
 TL1. . . . . . . .  D ADDR   008BH   A   
 TMOD . . . . . . .  D ADDR   0089H   A   
 TMR2CN . . . . . .  D ADDR   00C8H   A   
 TMR2H. . . . . . .  D ADDR   00CDH   A   
+A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 23:48:54 PAGE    12
+
 TMR2L. . . . . . .  D ADDR   00CCH   A   
 TMR2RLH. . . . . .  D ADDR   00CBH   A   
 TMR2RLL. . . . . .  D ADDR   00CAH   A   
@@ -580,8 +742,6 @@ TXBMT. . . . . . .  B ADDR   00F8H.1 A
 TXMODE . . . . . .  B ADDR   00C0H.6 A   
 VDM0CN . . . . . .  D ADDR   00FFH   A   
 WCOL . . . . . . .  B ADDR   00F8H.6 A   
-A51 MACRO ASSEMBLER  TEST3                                                                05/28/2023 17:30:00 PAGE    10
-
 XBR0 . . . . . . .  D ADDR   00E1H   A   
 XBR1 . . . . . . .  D ADDR   00E2H   A   
 
