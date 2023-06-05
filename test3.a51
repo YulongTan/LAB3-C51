@@ -1,6 +1,9 @@
 ;------------------------------------
 ;-  Generated Initialization File  --
 ;TABLE1是顺时针点亮数码管循环的表格
+;TABLE3是数码管显示数字0-9的表格
+;R0存储显示的数字
+;R1 DELAY1MS的次数
 ;------------------------------------
 
 $include (C8051F310.inc)
@@ -10,13 +13,43 @@ $include (C8051F310.inc)
 	  ORG 0000H
 	  LJMP MAIN
 	  ORG 0003H
-	  LJMP INTT0
+	  LJMP INTT0 ;0300H
 	  ORG 0100H
 MAIN: ACALL Init_Device
+      MOV SP,#1FH
       CLR BEEP
-;---------键盘扫描---------
-KEYPRO:
-      ACALL KEXAM
+	  CLR F0
+	  CLR PSW.1
+;LOOP: ACALL KEYPRO
+;WAIT: ACALL DISPLAY
+;      ACALL KEYPRO
+;      JNB F0, WAIT
+;	  ACALL NEWLIT
+LOOP: MOV R0,#1
+      ACALL NEWLIT
+	  SJMP LOOP
+		  
+;--------------------------------------------------------------------中断区域-----------------------------------------------
+;-------中断0亮灯--------
+      ORG 0300H
+INTT0:PUSH ACC
+      PUSH DPL
+	  PUSH DPH
+      CPL LED
+      LCALL D0_5s
+;      CPL BEEP
+;	  LCALL D2s
+;	  CPL BEEP
+      POP DPH
+	  POP DPL
+	  POP ACC
+	  SETB TR0
+      RETI
+;-------end---------
+;---------------------------------------------------------------------中断结束---------------------------------------------------
+;--------------------------------------------------------------------子程序区域--------------------------------------------------------------
+;-----------------------------键盘扫描-----------------------------------
+KEYPRO:ACALL KEXAM
       JC KEYPRO
 	  ACALL D10ms
 	  ACALL KEXAM
@@ -83,7 +116,7 @@ KEY2:
 	  ANL C, P2.7
 	  JNC KEY3  ;有键按下，转求列值
 	  CLR A
-	  AJMP KEYPRO
+	  AJMP KEYPRO ;若全部扫描完毕，等待下一次扫描
       
 KEY3: MOV A, P2
 KEY4: INC R3
@@ -103,32 +136,6 @@ KEY5: ACALL D10ms
 	  MUL AB
 	  ADD A, R4
 	  AJMP KEYADR
-	  AJMP KEYPRO
-	  RET
-;---------功能键地址转移------
-KEYADR:CJNE A, #09H, KYARD1
-       AJMP DIGPRO
-KYARD1:JC DIGPRO
-KEYTBL:MOV DPTR, #JMPTBL
-       CLR C
-	   SUBB A, #10
-	   RL A
-	   JMP @A+DPTR
-JMPTBL:AJMP AA
-       AJMP AA
-	   AJMP AA
-	   AJMP AA
-	   AJMP AA
-	   AJMP AA
-       RET
-;----------结束------------
-;-------功能按键程序-------
-AA:   CPL LED 
-      AJMP KEYPRO
-;-------结束-------------
-;-------数字按键处理---
-DIGPRO:CPL LED
-       AJMP KEYPRO
 ;--------检测键盘是否按下-------
 KEXAM:CLR P2.0
       CLR P2.1
@@ -147,11 +154,83 @@ KEXAM:CLR P2.0
 	  SETB P2.3
 	  RET
 ;--------检测结束--------------
-
-;-----------键盘扫描结束--------------
-	  AJMP $
-;-----------------------------子程序区域---------------------------------------
-;-----亮灯程序--------
+;	  AJMP KEYPRO
+;	  RET
+;---------功能键地址转移------
+KEYADR:CJNE A, #09H, KYARD1
+       AJMP DIGPRO          ;DIGPRO数字键处理
+KYARD1:JC DIGPRO
+KEYTBL:MOV DPTR, #JMPTBL
+       CLR C
+	   SUBB A, #10
+	   RL A
+	   JMP @A+DPTR
+JMPTBL:AJMP FUNC1
+       AJMP FUNC2
+	   AJMP FUNC3
+	   AJMP FUNC4
+	   AJMP FUNC5
+	   AJMP FUNC6
+       RET
+;----------结束------------
+;-------功能按键程序-------
+FUNC1:   CPL LED
+         SETB F0
+         RET
+FUNC2:   CPL LED
+         RET
+FUNC3:   CPL LED
+         RET
+FUNC4:   CPL LED
+         RET
+FUNC5:   CPL LED
+         RET
+FUNC6:   CPL LED
+         RET		 
+//      AJMP KEYPRO
+;-------结束-------------
+;-------数字按键处理---
+DIGPRO:
+       MOV DPTR, #JMPNUM
+	   CLR C
+	   RL A
+	   JMP @A+DPTR
+JMPNUM:AJMP NUM0
+       AJMP NUM1
+	   AJMP NUM2
+	   AJMP NUM3
+	   AJMP NUM4
+	   AJMP NUM5
+	   AJMP NUM6
+	   AJMP NUM7
+	   AJMP NUM8
+	   AJMP NUM9
+	   RET
+;--------数字按键功能------
+NUM0:  MOV R0,#0
+       RET
+NUM1:  MOV R0,#1
+       RET
+NUM2:  MOV R0,#2
+       RET
+NUM3:  MOV R0,#3
+       RET
+NUM4:  MOV R0,#4
+       RET
+NUM5:  MOV R0,#5
+       RET
+NUM6:  MOV R0,#6
+       RET
+NUM7:  MOV R0,#7
+       RET
+NUM8:  MOV R0,#8
+       RET
+NUM9:  MOV R0,#9
+       RET
+;       CPL LED
+;       AJMP KEYPRO
+;-------------------------------键盘扫描结束------------------------------------------
+;-----循环亮灯程序--------
 LIG:  mov R3,#6
       mov dptr,#TABLE1
 LP_LIG: clr a
@@ -163,6 +242,64 @@ LP_LIG: clr a
 	  ajmp LIG
 	  ret
 ;--------end----------
+;---------数码管显示-------
+DISPLAY: PUSH DPL
+         PUSH DPH
+         MOV A, R0
+		 MOV DPTR,#TABLE3
+		 MOVC A,@A+DPTR
+		 MOV P1,A
+		 ACALL D1ms
+		 POP DPH
+		 POP DPL
+//		 DJNZ R0,DISPLAY
+         RET
+;--------结束---------------
+;------频率可控的循环亮灯----
+NEWLIT: MOV R3, #6
+        MOV DPTR, #TABLE1
+		JB PSW.1 ,LIT_LOP       ;PSW.1=1时顺时针循环
+        MOV DPTR, #TABLE2		;PSW.1=0时逆时针循环
+LIT_LOP:
+        CLR A
+        MOVC A, @A+DPTR
+		MOV R5, A
+;		CLR P0.6
+;		CLR P0.7
+;		MOV P1, A
+;		ACALL D1ms
+		ACALL DELAY
+		INC DPTR
+		DJNZ R3, LIT_LOP
+		AJMP NEWLIT
+		RET
+;------end------------------
+;-------DELAY---------
+DELAY: MOV A, #56
+       MOV B, R0
+	   DIV AB
+	   MOV R1, A
+INDEL:                   ;大概3MS
+       SETB P0.6
+	   SETB P0.7
+	   ACALL DISPLAY
+       ACALL D1ms
+       CLR P0.6
+	   CLR P0.7
+	   MOV P1, R5
+	   ACALL D1ms
+       DJNZ R1,INDEL
+	   RET
+;-------END-----------
+;-------DELAY 1MS-------
+D1ms: MOV TMOD,#01H
+      MOV TH0,#0FEH
+	  MOV TL0,#01H
+	  SETB TR0
+	  JNB TF0,$
+	  CLR TF0
+	  CLR TR0
+	  RET
 ;-------delay 10ms-------
 D10ms:MOV TMOD,#01H
       MOV TH0,#0ECH
@@ -173,16 +310,6 @@ D10ms:MOV TMOD,#01H
 	  CLR TR0
 	  RET
 ;--------end------------	
-;-------中断0亮灯--------
-      ORG 0200H
-INTT0:CPL LED
-      LCALL D0_5s
-	  CPL LED
-;      CPL BEEP
-;	  LCALL D2s
-;	  CPL BEEP
-      RETI
-;-------end---------
 ;-------delay 0.5s---------
 D0_5S:MOV R7, #5
 L_0_5:MOV TMOD,#01H
@@ -209,9 +336,11 @@ L_2:  MOV TMOD,#01H
 	  CLR TR0
 	  RET
 ;--------end-------
-;-----------------------------子程序结束-------------------------------------------------
+;--------------------------------------------------------------子程序结束-------------------------------------------------
 ;--------------表格----------------
 TABLE1:DB 0C0H,60H,30H,18H,0CH,84H
+TABLE2:DB 84H,0CH,18H,30H,60H,0C0H
+TABLE3:DB 0FCH,60H,0DAH,0F2H,66H,0B6H,0BEH,0E0H,0FEH,0F6H
 ;------------表格结束---------------
 ; Peripheral specific initialization functions,
 ; Called from the Init_Device label
